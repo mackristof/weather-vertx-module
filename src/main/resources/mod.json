@@ -1,0 +1,20 @@
+{
+
+    // main verticle
+    "main": "groovy:fr.mackristof.weather.MainVerticle",
+
+
+    // If your module is going to be registered in the Vert.x module registry you will also need the following
+    // mandatory fields
+    "description": "Put Davis Vantage Weather Station data to MQTT",
+    "licenses": ["The Apache Software License Version 2.0"],
+    "author": "Christophe Mourette",
+
+    // Optional fields
+    "developers": ["Christophe Mourette", "Other Dev 2"],
+    "keywords": ["vertx", "mqtt", "weather", "davis vantage"],
+    "homepage": "url to your project page",
+
+    "auto-redeploy": true
+
+}

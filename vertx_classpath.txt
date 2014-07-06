@@ -1,0 +1,5 @@
+src/main/resources
+bin
+out/production/weather-vertx-module
+out/test/weather-vertx-module
+build/deps
