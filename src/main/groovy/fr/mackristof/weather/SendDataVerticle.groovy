@@ -14,7 +14,7 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
  */
 @CompileStatic
 class SendDataVerticle extends Verticle {
-    final String broker = "tcp://iot.eclipse.org:1883";
+    final String broker = "tcp://localhost:1883";
     final String clientId     = "DavisTest";
     final String topic        = "weather";
     final int qos             = 2;

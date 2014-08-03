@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <title>MQTT </title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <script src="mqttws31.js"></script>
+    <script src="gauge.js"></script>
+    <script src="https://code.jquery.com/jquery.js"></script>
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script>
+    var obj;
+      // Create a client instance
+client = new Messaging.Client("10.0.0.10", 11883, "", "clientId"+Math.round(+new Date() / 1000));
+
+// set callback handlers
+client.onConnectionLost = onConnectionLost;
+client.onMessageArrived = onMessageArrived;
+
+// connect the client
+client.connect({onSuccess:onConnect, onFailure:onFailure, useSSL:false});
+
+function onFailure() {
+  console.log("onFailure");
+}
+
+// called when the client connects
+function onConnect() {
+  // Once a connection has been made, make a subscription and send a message.
+  console.log("onConnect");
+  $('#tdStatus').html("connected")
+  client.subscribe("weather");
+/*  message = new Messaging.Message("Hello");
+  message.destinationName = "/World";
+  client.send(message); */
+}
+
+// called when the client loses its connection
+function onConnectionLost(responseObject) {
+  if (responseObject.errorCode !== 0) {
+    //$('#tdError').html(responseObject.errorMessage)
+    console.log("onConnectionLost:"+responseObject.errorMessage);
+  }
+}
+
+// called when a message arrives
+function onMessageArrived(message) {
+  console.log("onMessageArrived:"+message.payloadString);
+  obj = jQuery.parseJSON(message.payloadString)
+  $('#tdMessage').html(obj.windSpeed);
+}
+    </script>
+
+   <script>
+
+
+			var gauges = [];
+
+			function createGauge(name, label, min, max)
+			{
+				var config =
+				{
+					size: 120,
+					label: label,
+					min: undefined != min ? min : 0,
+					max: undefined != max ? max : 100,
+					minorTicks: 5
+				}
+
+				var range = config.max - config.min;
+				config.yellowZones = [{ from: config.min + range*0.75, to: config.min + range*0.9 }];
+				config.redZones = [{ from: config.min + range*0.9, to: config.max }];
+
+				gauges[name] = new Gauge(name + "GaugeContainer", config);
+				gauges[name].render();
+			}
+
+			function createGauges()
+			{
+				createGauge("windSpeed", "vitesse Vent",0,60);
+				createGauge("outsideTemp", "Temp. Ext.",-10,50);
+
+			}
+
+			function updateGauges()
+			{
+				for (var key in gauges)
+				{
+					var value = getWeatherValue(key)
+					gauges[key].redraw(value);
+				}
+			}
+
+			function getWeatherValue(gauge){
+			  if (obj !=null){
+			    console.log(eval("obj."+gauge));
+			    return eval("obj."+gauge)
+			  }
+			}
+
+			function getRandomValue(gauge)
+			{
+				var overflow = 0; //10;
+				return gauge.config.min - overflow + (gauge.config.max - gauge.config.min + overflow*2) *  Math.random();
+			}
+
+			function initialize()
+			{
+				createGauges();
+				setInterval(updateGauges, 5000);
+			}
+
+		</script>
+  </head>
+  <body onload="initialize()">
+		<span id="windSpeedGaugeContainer"></span>
+		<span id="outsideTempGaugeContainer"></span>
+
+  </body>
+</html>
